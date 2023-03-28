@@ -52,6 +52,17 @@ public class Graph
 			return null;
 		}
 	}
+	public int getDegree(String id)
+	{
+		if (vertices.containsKey(id))
+		{
+			return adjacencyList.get(id).size();
+		}
+		else
+		{
+			return -1;
+		}
+	}
 	public double getMinX()
 	{
 		return minX;
@@ -67,6 +78,21 @@ public class Graph
 	public double getMaxY()
 	{
 		return maxY;
+	}
+	public boolean areAdjacent(Vertex v1, Vertex v2)
+	{
+		for (Edge e : edges)
+		{
+			if (e.getV1().equals(v1) && e.getV2().equals(v2))
+			{
+				return true;
+			}
+			if (e.getV2().equals(v1) && e.getV1().equals(v2))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	public void addVertex(Vertex vertex)
 	{
