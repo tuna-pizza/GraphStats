@@ -126,7 +126,14 @@ public class GraphMLWriter
 		Element yLineStyle = document.createElement("y:LineStyle");
 		yLineStyle.setAttribute("color",e.getColor());
 		yLineStyle.setAttribute("type","line");
-		yLineStyle.setAttribute("width","1.0");
+		if (e.getColor().equals("#FF0000") || e.getColor().equals("#ff0000"))
+		{
+			yLineStyle.setAttribute("width", "2.0");
+		}
+		else
+		{
+			yLineStyle.setAttribute("width", "1.0");
+		}
 		yPolyLineEdge.appendChild(yLineStyle);
 		Element yArrows = document.createElement("y:Arrows");
 		yArrows.setAttribute("source","none");

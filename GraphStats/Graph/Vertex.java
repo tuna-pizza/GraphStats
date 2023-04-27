@@ -11,7 +11,7 @@ public class Vertex
 
 	public Vertex(String id,double x,double y)
 	{
-		this(id,x,y,"#99CCFF");
+		this(id,x,y,"#m");
 	}
 	public Vertex(String id,double x,double y,String color)
 	{

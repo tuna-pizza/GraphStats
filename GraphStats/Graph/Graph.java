@@ -135,7 +135,16 @@ public class Graph
 	{
 		return this.edges.iterator();
 	}
-	public void normalize (double minVertexDistance)
+
+	public void normalizeToSideLength (double targetSideLength)
+	{
+		double width = maxX - minX;
+		double height = maxY - minY;
+		double sideLength = Math.max(width,height);
+		double scaleFactor = targetSideLength/sideLength;
+		normalize(scaleFactor);
+	}
+	public void normalizeToMinimumVertexDistance(double minVertexDistance)
 	{
 		double currentMinDistance = Double.MAX_VALUE;
 		for (Vertex v1 : vertices.values())
@@ -154,6 +163,11 @@ public class Graph
 			}
 		}
 		double scaleRatio = Math.max(1,minVertexDistance/currentMinDistance);
+		normalize(scaleRatio);
+	}
+
+	private void normalize (double scaleRatio)
+	{
 		double minimumX = Double.MAX_VALUE;
 		double minimumY = Double.MAX_VALUE;
 		for (Vertex v : vertices.values())

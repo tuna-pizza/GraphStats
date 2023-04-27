@@ -65,8 +65,16 @@ public class AestheticsQuantifier
 				if (!v1.equals(v2))
 				{
 					double euclideanDistance = Utils.distance(v1.getCoordinate(),v2.getCoordinate());
-					int graphTheoreticDistance = graphTheoreticDistances.get(v1).get(v2);
-					double vertexPairStress = Math.pow(euclideanDistance-graphTheoreticDistance*L,2)/Math.pow(graphTheoreticDistance,2);
+					int graphTheoreticDistance;
+					if (graphTheoreticDistances.get(v1).containsKey(v2))
+					{
+						graphTheoreticDistance = graphTheoreticDistances.get(v1).get(v2);
+					}
+					else
+					{
+						graphTheoreticDistance = maxGraphTheoreticDistance + 1;
+					}
+					double vertexPairStress = Math.pow(euclideanDistance-graphTheoreticDistance*L,2)/Math.pow(graphTheoreticDistance*L,2);
 					stress += vertexPairStress;
 				}
 			}
@@ -77,7 +85,7 @@ public class AestheticsQuantifier
 	{
 		double width = g.getMaxX()-g.getMinX();
 		double height = g.getMaxY()-g.getMinY();
-		double L0 = (width+height)/2;
+		double L0 = Math.max(width,height);
 		return L0/maxGraphTheoreticDistance;
 	}
 	public double getJaccardIndex()
@@ -147,6 +155,21 @@ public class AestheticsQuantifier
 		{
 			return -1;
 		}
+	}
+
+	public double getEdgeLengthRatio()
+	{
+		double minLength = Double.MAX_VALUE;
+		double maxLength = Double.MIN_VALUE;
+		Iterator<Edge> e_it = g.getEdges();
+		while(e_it.hasNext())
+		{
+			Edge e = e_it.next();
+			double length = Utils.distance(e.getV1().getCoordinate(),e.getV2().getCoordinate());
+			minLength = Math.min(minLength,length);
+			maxLength = Math.max(maxLength,length);
+		}
+		return  minLength/maxLength;
 	}
 	public int getCrossingNumber()
 	{
@@ -223,6 +246,24 @@ public class AestheticsQuantifier
 
 	public double getNodeResolution()
 	{
-		return -1;
+		double minDistance = Double.MAX_VALUE;
+		double maxDistance = Double.MIN_VALUE;
+		Iterator<Vertex> v_it1 = g.getVertices();
+		while (v_it1.hasNext())
+		{
+			Vertex v1 = v_it1.next();
+			Iterator<Vertex> v_it2 = g.getVertices();
+			while (v_it2.hasNext())
+			{
+				Vertex v2 = v_it2.next();
+				if (!v1.equals(v2))
+				{
+					double distance = Utils.distance(v1.getCoordinate(), v2.getCoordinate());
+					minDistance = Math.min(minDistance, distance);
+					maxDistance = Math.max(maxDistance, distance);
+				}
+			}
+		}
+		return minDistance/maxDistance;
 	}
 }

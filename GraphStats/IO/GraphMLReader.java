@@ -18,16 +18,22 @@ public class GraphMLReader
 	private final String file;
 	public enum InputType {yEdOld, yEdNew};
 	private InputType inputType;
-	private String dataFieldID;
+	private String nodeDataFieldID;
+	private String edgeDataFieldID;
 	public GraphMLReader(String file, InputType inputType)
 	{
 		this.file = file;
-		this.dataFieldID = "d6";
+		this.nodeDataFieldID = "d6";
+		this.edgeDataFieldID = "d10";
 		this.inputType = inputType;
 	}
-	public void setDataFieldID(String dataFieldID)
+	public void setNodeDataFieldID(String nodeDataFieldID)
 	{
-		this.dataFieldID = dataFieldID;
+		this.nodeDataFieldID = nodeDataFieldID;
+	}
+	public void setEdgeDataFieldID(String edgeDataFieldID)
+	{
+		this.edgeDataFieldID = edgeDataFieldID;
 	}
 	public Graph read()
 	{
@@ -79,9 +85,50 @@ public class GraphMLReader
 				String targetID = edgeAttributes.getNamedItem("target").getTextContent();
 				Vertex v1 = g.getVertex(sourceID);
 				Vertex v2 = g.getVertex(targetID);
+				String color = "#000000";
+				if (inputType == InputType.yEdOld)
+				{
+					Node data = edge.getFirstChild();
+					while (data != null)
+					{
+						if (data.getNodeName().equals("data"))
+						{
+							NamedNodeMap dataAttributes = data.getAttributes();
+							if (dataAttributes.getNamedItem("key") != null)
+							{
+								if (dataAttributes.getNamedItem("key").getTextContent().equals(edgeDataFieldID))
+								{
+									Node yPolyLineEdge = data.getFirstChild();
+									while (yPolyLineEdge != null)
+									{
+										if (yPolyLineEdge.getNodeName().equals("y:PolyLineEdge"))
+										{
+											Node yLineStyle = yPolyLineEdge.getFirstChild();
+											while (yLineStyle != null)
+											{
+												if (yLineStyle.getNodeName().equals("y:LineStyle"))
+												{
+													NamedNodeMap lineStyleAttributes = yLineStyle.getAttributes();
+													if (lineStyleAttributes.getNamedItem("color") != null)
+													{
+														color = lineStyleAttributes.getNamedItem("color").getTextContent();
+													}
+												}
+												yLineStyle = yLineStyle.getNextSibling();
+											}
+										}
+										yPolyLineEdge = yPolyLineEdge.getNextSibling();
+									}
+									break;
+								}
+							}
+						}
+						data = data.getNextSibling();
+					}
+				}
 				if (v1 != null && v2 != null)
 				{
-					Edge e = new Edge(v1,v2);
+					Edge e = new Edge(v1,v2,color);
 					g.addEdge(e);
 				}
 			}
@@ -110,7 +157,7 @@ public class GraphMLReader
 							NamedNodeMap dataAttributes = data.getAttributes();
 							if (dataAttributes.getNamedItem("key") != null)
 							{
-								if (dataAttributes.getNamedItem("key").getTextContent().equals(dataFieldID))
+								if (dataAttributes.getNamedItem("key").getTextContent().equals(nodeDataFieldID))
 								{
 									Node yShapeNode = data.getFirstChild();
 									while (yShapeNode != null)
@@ -150,7 +197,7 @@ public class GraphMLReader
 							NamedNodeMap dataAttributes = data.getAttributes();
 							if (dataAttributes.getNamedItem("key") != null)
 							{
-								if (dataAttributes.getNamedItem("key").getTextContent().equals(dataFieldID))
+								if (dataAttributes.getNamedItem("key").getTextContent().equals(nodeDataFieldID))
 								{
 									Node yShapeNode = data.getFirstChild();
 									while (yShapeNode != null)
